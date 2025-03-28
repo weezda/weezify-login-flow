@@ -17,10 +17,10 @@ const Logo = ({ size = 'md', className }: LogoProps) => {
   return (
     <div className={cn("flex items-center justify-center", className)}>
       <div className={cn(
-        "rounded-full border-2 border-black overflow-hidden flex items-center justify-center bg-black text-white font-bold",
+        "rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold shadow-lg",
         sizeClasses[size]
       )}>
-        <span className="text-2xl">W</span>
+        <span className="text-2xl font-extrabold">W</span>
       </div>
     </div>
   );
