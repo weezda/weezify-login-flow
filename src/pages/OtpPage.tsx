@@ -1,15 +1,22 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ArrowLeft } from 'lucide-react';
 import AuthCard from '@/components/auth/AuthCard';
 import AlertService from '@/services/AlertService';
 import { useAuth } from '@/contexts/AuthContext';
+import OtpInput from '@/components/auth/OtpInput';
 
 // API base URL
 const API_BASE_URL = "https://weez-auth-api-ewhdbra3dbbtfaaw.canadacentral-01.azurewebsites.net";
+
+// Define flow types for better code organization
+const FLOW_TYPES = {
+  LOGIN: "login",
+  REGISTRATION: "registration",
+  FORGOT_PASSWORD: "forgotpassword",
+};
 
 const OtpPage = () => {
   const navigate = useNavigate();
@@ -18,12 +25,13 @@ const OtpPage = () => {
   
   // Get data from location state
   const { 
-    username, 
-    fromScreen, 
-    email,
-    password,
-    name,
-    isUnverifiedAccount 
+    username = "", 
+    fromScreen = FLOW_TYPES.REGISTRATION,
+    email = "",
+    isUnverifiedAccount = false,
+    password = "",
+    name = "",
+    newPassword = "", 
   } = location.state || {};
   
   // Initialize state
@@ -31,14 +39,6 @@ const OtpPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [resendCounter, setResendCounter] = useState(30);
   const [isResending, setIsResending] = useState(false);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  
-  // Effect to auto-focus first input
-  useEffect(() => {
-    if (inputRefs.current[0]) {
-      inputRefs.current[0].focus();
-    }
-  }, []);
   
   // Effect for countdown timer
   useEffect(() => {
@@ -58,59 +58,8 @@ const OtpPage = () => {
     }
   }, [isUnverifiedAccount]);
   
-  // Handle OTP input change
-  const handleChange = (index: number, value: string) => {
-    if (value.length > 1) {
-      value = value[0];
-    }
-    
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    
-    // Auto-focus next input
-    if (value && index < 5 && inputRefs.current[index + 1]) {
-      inputRefs.current[index + 1].focus();
-    }
-  };
-  
-  // Handle key down events for navigation and deletion
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0 && inputRefs.current[index - 1]) {
-      inputRefs.current[index - 1].focus();
-    } else if (e.key === 'ArrowLeft' && index > 0 && inputRefs.current[index - 1]) {
-      inputRefs.current[index - 1].focus();
-    } else if (e.key === 'ArrowRight' && index < 5 && inputRefs.current[index + 1]) {
-      inputRefs.current[index + 1].focus();
-    }
-  };
-  
-  // Handle pasting OTP
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').trim();
-    
-    if (/^\d+$/.test(pastedData)) {
-      const digits = pastedData.slice(0, 6).split('');
-      const newOtp = [...otp];
-      
-      digits.forEach((digit, index) => {
-        if (index < 6) {
-          newOtp[index] = digit;
-        }
-      });
-      
-      setOtp(newOtp);
-      
-      // Focus the next empty input or the last input
-      const nextEmptyIndex = newOtp.findIndex(val => !val);
-      if (nextEmptyIndex !== -1 && inputRefs.current[nextEmptyIndex]) {
-        inputRefs.current[nextEmptyIndex].focus();
-      } else if (inputRefs.current[5]) {
-        inputRefs.current[5].focus();
-      }
-    }
-  };
+  // Determine email to use (normalize if needed)
+  const emailToUse = email || username;
   
   // Handle OTP submission
   const handleSubmit = async () => {
@@ -124,19 +73,22 @@ const OtpPage = () => {
     setIsLoading(true);
     
     try {
-      const endpoint = fromScreen === 'registration' 
-        ? '/api/verify-email' 
-        : '/api/verify-login';
+      const endpoint = fromScreen === FLOW_TYPES.REGISTRATION
+        ? '/api/verify-email'
+        : fromScreen === FLOW_TYPES.FORGOT_PASSWORD
+          ? '/api/reset-password'
+          : '/api/verify-login';
+      
+      const body = fromScreen === FLOW_TYPES.FORGOT_PASSWORD
+        ? { email: emailToUse, otp: otpValue, new_password: newPassword }
+        : { email: emailToUse, otp: otpValue };
       
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email,
-          otp: otpValue,
-        }),
+        body: JSON.stringify(body),
       });
       
       const data = await response.json();
@@ -147,23 +99,26 @@ const OtpPage = () => {
         return;
       }
       
-      // Handle successful verification
-      if (fromScreen === 'registration') {
+      // Handle successful verification based on flow type
+      if (fromScreen === FLOW_TYPES.REGISTRATION) {
         // For registration, we should have received a token
         if (data.token) {
           // Log the user in
-          await login(data.token, email, data.refreshToken || null);
+          await login(data.token, emailToUse, data.refreshToken || null);
           
           AlertService.showSuccess('Success', 'Your account has been verified!');
           navigate('/');
         } else {
           navigate('/email-login');
         }
+      } else if (fromScreen === FLOW_TYPES.FORGOT_PASSWORD) {
+        AlertService.showSuccess('Success', 'Password has been reset successfully!');
+        navigate('/email-login');
       } else {
         // For login, we should have received a token
         if (data.token) {
           // Log the user in
-          await login(data.token, email, data.refreshToken || null);
+          await login(data.token, emailToUse, data.refreshToken || null);
           
           AlertService.showSuccess('Success', 'Login successful!');
           navigate('/');
@@ -195,7 +150,7 @@ const OtpPage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email,
+          email: emailToUse,
         }),
       });
       
@@ -217,9 +172,9 @@ const OtpPage = () => {
       setIsResending(false);
     }
   };
-  
+
   // If no email or username, redirect to login
-  if (!email && !username) {
+  if (!emailToUse) {
     useEffect(() => {
       navigate('/login');
     }, []);
@@ -233,7 +188,7 @@ const OtpPage = () => {
           variant="ghost" 
           size="icon" 
           className="rounded-full" 
-          onClick={() => navigate(fromScreen === 'registration' ? '/signup' : '/email-login')}
+          onClick={() => navigate(fromScreen === FLOW_TYPES.REGISTRATION ? '/signup' : '/email-login')}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -242,29 +197,17 @@ const OtpPage = () => {
       <div className="w-full max-w-md">
         <AuthCard
           title="Verify Your Email"
-          description={`We've sent a verification code to ${email || username}`}
+          description={isUnverifiedAccount 
+            ? `This email is already registered but not verified. Enter the verification code sent to ${emailToUse}` 
+            : `We've sent a verification code to ${emailToUse}`}
           className="animate-fade-in"
         >
-          <div className="space-y-6">
-            <div className="flex justify-center gap-2">
-              {otp.map((digit, index) => (
-                <div key={index} className="w-10">
-                  <Input
-                    ref={el => inputRefs.current[index] = el}
-                    value={digit}
-                    onChange={e => handleChange(index, e.target.value)}
-                    onKeyDown={e => handleKeyDown(index, e)}
-                    onPaste={index === 0 ? handlePaste : undefined}
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={1}
-                    className="w-full text-center text-lg font-semibold h-12 border-2"
-                    autoComplete="one-time-code"
-                  />
-                </div>
-              ))}
-            </div>
+          <div className="space-y-8">
+            <OtpInput 
+              otp={otp} 
+              setOtp={setOtp} 
+              className="my-6"
+            />
             
             <Button
               onClick={handleSubmit}
@@ -274,8 +217,8 @@ const OtpPage = () => {
               {isLoading ? 'Verifying...' : 'Verify'}
             </Button>
             
-            <div className="text-center">
-              <p className="text-sm text-gray-500 mb-2">Didn't receive a code?</p>
+            <div className="text-center mt-2">
+              <p className="text-sm text-gray-600 mb-2">Didn't receive a code?</p>
               <Button 
                 variant="link" 
                 disabled={resendCounter > 0 && !isUnverifiedAccount}

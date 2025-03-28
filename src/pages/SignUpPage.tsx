@@ -13,7 +13,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import PasswordInput from '@/components/auth/PasswordInput';
 import ProgressSteps from '@/components/auth/ProgressSteps';
-import AuthCard from '@/components/auth/AuthCard';
 
 // API base URL
 const API_BASE_URL = "https://weez-auth-api-ewhdbra3dbbtfaaw.canadacentral-01.azurewebsites.net";
@@ -125,12 +124,12 @@ const SignUpPage = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 p-4">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-white p-4">
       <div className="absolute top-4 left-4">
         <Button 
           variant="ghost" 
           size="icon" 
-          className="rounded-full" 
+          className="rounded-full shadow-sm" 
           onClick={() => navigate('/')}
         >
           <ArrowLeft className="h-5 w-5" />
@@ -138,16 +137,13 @@ const SignUpPage = () => {
       </div>
       
       <div className="w-full max-w-md mb-6">
-        <div className="text-center mb-6">
-          <Logo className="mx-auto mb-4" />
-          <h1 className="text-2xl font-bold">Create your account</h1>
+        <div className="text-center mb-8">
+          <Logo className="mx-auto mb-6" size="md" />
+          <h1 className="text-2xl font-bold mb-2">Create your account</h1>
           <p className="text-sm text-gray-500">Step 1 of 3: Account Details</p>
         </div>
         
-        <AuthCard
-          title=""
-          className="animate-fade-in border-none shadow-none"
-        >
+        <div className="space-y-6 bg-white rounded-xl p-6 shadow-sm animate-fade-in">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
@@ -159,6 +155,7 @@ const SignUpPage = () => {
                     <FormControl>
                       <Input 
                         placeholder="Enter your full name" 
+                        className="h-12 border-2 border-gray-300 focus:border-black"
                         {...field} 
                       />
                     </FormControl>
@@ -177,6 +174,7 @@ const SignUpPage = () => {
                       <Input 
                         placeholder="Enter your email" 
                         type="email" 
+                        className="h-12 border-2 border-gray-300 focus:border-black"
                         {...field} 
                       />
                     </FormControl>
@@ -194,6 +192,7 @@ const SignUpPage = () => {
                     <FormControl>
                       <PasswordInput 
                         placeholder="Create a password (min. 8 characters)" 
+                        className="h-12 border-2 border-gray-300 focus:border-black"
                         {...field} 
                       />
                     </FormControl>
@@ -211,6 +210,7 @@ const SignUpPage = () => {
                     <FormControl>
                       <PasswordInput 
                         placeholder="Confirm your password" 
+                        className="h-12 border-2 border-gray-300 focus:border-black"
                         {...field} 
                       />
                     </FormControl>
@@ -220,7 +220,7 @@ const SignUpPage = () => {
               />
               
               <div className="text-sm text-center py-2">
-                <p>
+                <p className="text-gray-600">
                   By signing up, you agree to our{" "}
                   <Button variant="link" className="p-0 h-auto text-sm font-semibold underline text-black">
                     Terms of Service
@@ -234,18 +234,31 @@ const SignUpPage = () => {
               
               <Button
                 type="submit"
-                className="w-full h-12 bg-black hover:bg-gray-800 rounded-full"
+                className="w-full h-12 bg-black hover:bg-gray-800 rounded-full text-white mt-4"
                 disabled={isLoading}
               >
                 {isLoading ? "Processing..." : "Continue"}
               </Button>
-              
-              <ProgressSteps steps={steps} currentStep={1} className="mt-8 mb-4" />
             </form>
           </Form>
-        </AuthCard>
+
+          <div className="relative h-px bg-gray-200 my-6">
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-gray-500 text-sm">
+              or continue with
+            </div>
+          </div>
+
+          <SocialButtons
+            onGoogleClick={() => handleSocialLogin("Google")}
+            onFacebookClick={() => handleSocialLogin("Facebook")}
+            onLinkedInClick={() => handleSocialLogin("LinkedIn")}
+            className="gap-3"
+          />
+          
+          <ProgressSteps steps={steps} currentStep={1} className="mt-8 mb-4" />
+        </div>
         
-        <div className="text-center mt-6">
+        <div className="text-center mt-8">
           <p className="text-gray-600">Already have an account?</p>
           <Button 
             variant="link" 
