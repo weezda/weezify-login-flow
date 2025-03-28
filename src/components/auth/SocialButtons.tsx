@@ -1,19 +1,17 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Facebook, Linkedin } from 'lucide-react';
+import { Linkedin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SocialButtonsProps {
   onGoogleClick?: () => void;
-  onFacebookClick?: () => void;
   onLinkedInClick?: () => void;
   className?: string;
 }
 
 const SocialButtons = ({ 
   onGoogleClick, 
-  onFacebookClick, 
   onLinkedInClick,
   className 
 }: SocialButtonsProps) => {
@@ -45,17 +43,6 @@ const SocialButtons = ({
           </svg>
         </div>
         <span className="font-medium">Continue with Google</span>
-      </Button>
-      
-      <Button 
-        variant="outline" 
-        className="w-full h-12 border-gray-300 relative rounded-xl hover:bg-white hover:text-gray-900 hover:border-gray-400 transition-all"
-        onClick={onFacebookClick}
-      >
-        <div className="absolute left-4">
-          <Facebook className="h-5 w-5 text-blue-600" />
-        </div>
-        <span className="font-medium">Continue with Facebook</span>
       </Button>
       
       <Button 

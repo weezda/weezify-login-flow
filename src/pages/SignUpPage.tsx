@@ -12,7 +12,6 @@ import AlertService from '@/services/AlertService';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import PasswordInput from '@/components/auth/PasswordInput';
-import ProgressSteps from '@/components/auth/ProgressSteps';
 
 // API base URL
 const API_BASE_URL = "https://weez-auth-api-ewhdbra3dbbtfaaw.canadacentral-01.azurewebsites.net";
@@ -116,13 +115,6 @@ const SignUpPage = () => {
     }
   };
 
-  // Define progress steps
-  const steps = [
-    { number: 1, label: 'Account' },
-    { number: 2, label: 'Verify' },
-    { number: 3, label: 'Profile' }
-  ];
-
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-white p-4">
       <div className="absolute top-4 left-4">
@@ -136,16 +128,15 @@ const SignUpPage = () => {
         </Button>
       </div>
       
-      <div className="w-full max-w-md mb-6">
-        <div className="text-center mb-8">
-          <Logo className="mx-auto mb-6" size="md" />
-          <h1 className="text-2xl font-bold mb-2">Create your account</h1>
-          <p className="text-sm text-gray-500">Step 1 of 3: Account Details</p>
+      <div className="w-full max-w-md">
+        <div className="text-center mb-6">
+          <Logo className="mx-auto mb-4" size="md" />
+          <h1 className="text-2xl font-bold">Create your account</h1>
         </div>
         
-        <div className="space-y-6 bg-white rounded-xl p-6 shadow-sm animate-fade-in">
+        <div className="space-y-5 bg-white rounded-xl animate-fade-in">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -155,7 +146,7 @@ const SignUpPage = () => {
                     <FormControl>
                       <Input 
                         placeholder="Enter your full name" 
-                        className="h-12 border-2 border-gray-300 focus:border-black"
+                        className="h-11 border-2 border-gray-300 focus:border-black"
                         {...field} 
                       />
                     </FormControl>
@@ -174,7 +165,7 @@ const SignUpPage = () => {
                       <Input 
                         placeholder="Enter your email" 
                         type="email" 
-                        className="h-12 border-2 border-gray-300 focus:border-black"
+                        className="h-11 border-2 border-gray-300 focus:border-black"
                         {...field} 
                       />
                     </FormControl>
@@ -192,7 +183,7 @@ const SignUpPage = () => {
                     <FormControl>
                       <PasswordInput 
                         placeholder="Create a password (min. 8 characters)" 
-                        className="h-12 border-2 border-gray-300 focus:border-black"
+                        className="h-11 border-2 border-gray-300 focus:border-black"
                         {...field} 
                       />
                     </FormControl>
@@ -210,7 +201,7 @@ const SignUpPage = () => {
                     <FormControl>
                       <PasswordInput 
                         placeholder="Confirm your password" 
-                        className="h-12 border-2 border-gray-300 focus:border-black"
+                        className="h-11 border-2 border-gray-300 focus:border-black"
                         {...field} 
                       />
                     </FormControl>
@@ -219,14 +210,14 @@ const SignUpPage = () => {
                 )}
               />
               
-              <div className="text-sm text-center py-2">
+              <div className="text-xs text-center">
                 <p className="text-gray-600">
                   By signing up, you agree to our{" "}
-                  <Button variant="link" className="p-0 h-auto text-sm font-semibold underline text-black">
-                    Terms of Service
+                  <Button variant="link" className="p-0 h-auto text-xs font-semibold underline text-black">
+                    Terms
                   </Button>{" "}
                   and{" "}
-                  <Button variant="link" className="p-0 h-auto text-sm font-semibold underline text-black">
+                  <Button variant="link" className="p-0 h-auto text-xs font-semibold underline text-black">
                     Privacy Policy
                   </Button>
                 </p>
@@ -234,7 +225,7 @@ const SignUpPage = () => {
               
               <Button
                 type="submit"
-                className="w-full h-12 bg-black hover:bg-gray-800 rounded-full text-white mt-4"
+                className="w-full h-11 bg-black hover:bg-gray-800 rounded-full text-white mt-2"
                 disabled={isLoading}
               >
                 {isLoading ? "Processing..." : "Continue"}
@@ -242,27 +233,24 @@ const SignUpPage = () => {
             </form>
           </Form>
 
-          <div className="relative h-px bg-gray-200 my-6">
-            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-gray-500 text-sm">
+          <div className="relative h-px bg-gray-200 my-4">
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-gray-500 text-xs">
               or continue with
             </div>
           </div>
 
           <SocialButtons
             onGoogleClick={() => handleSocialLogin("Google")}
-            onFacebookClick={() => handleSocialLogin("Facebook")}
             onLinkedInClick={() => handleSocialLogin("LinkedIn")}
-            className="gap-3"
+            className="gap-2"
           />
-          
-          <ProgressSteps steps={steps} currentStep={1} className="mt-8 mb-4" />
         </div>
         
-        <div className="text-center mt-8">
-          <p className="text-gray-600">Already have an account?</p>
+        <div className="text-center mt-6">
+          <p className="text-gray-600 text-sm">Already have an account?</p>
           <Button 
             variant="link" 
-            className="font-semibold text-black underline p-0"
+            className="font-semibold text-black underline p-0 text-sm"
             onClick={() => navigate('/login')}
           >
             Log in
