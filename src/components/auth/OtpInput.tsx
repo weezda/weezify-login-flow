@@ -28,11 +28,16 @@ const OtpInput = ({ otp, setOtp, length = 6, className }: OtpInputProps) => {
         maxLength={length}
         value={otpValue}
         onChange={handleValueChange}
-        className="gap-2"
+        className="gap-3"
+        pattern="^[0-9]+$"
       >
         <InputOTPGroup>
           {Array.from({ length }).map((_, index) => (
-            <InputOTPSlot key={index} index={index} className="w-12 h-14 text-xl font-bold" />
+            <InputOTPSlot 
+              key={index} 
+              index={index} 
+              className="w-12 h-14 text-xl font-bold border-2 border-gray-300 focus:border-black transition-colors rounded-lg overflow-hidden" 
+            />
           ))}
         </InputOTPGroup>
       </InputOTP>

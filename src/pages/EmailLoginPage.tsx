@@ -113,12 +113,12 @@ const EmailLoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 p-4">
-      <div className="absolute top-4 left-4">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+      <div className="absolute top-4 left-4 md:top-8 md:left-8">
         <Button 
           variant="ghost" 
           size="icon" 
-          className="rounded-full" 
+          className="rounded-full hover:bg-black/5" 
           onClick={() => navigate('/login')}
         >
           <ArrowLeft className="h-5 w-5" />
@@ -128,7 +128,8 @@ const EmailLoginPage = () => {
       <div className="w-full max-w-md">
         <AuthCard 
           title="Log in with email" 
-          className="animate-fade-in"
+          description="Enter your email and password to continue"
+          className="animate-fade-in shadow-xl border-none"
         >
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -137,11 +138,12 @@ const EmailLoginPage = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-sm font-medium">Email</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="Enter your email" 
                         type="email" 
+                        className="h-11 text-base border-gray-300 focus:border-black" 
                         {...field} 
                       />
                     </FormControl>
@@ -155,10 +157,11 @@ const EmailLoginPage = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel className="text-sm font-medium">Password</FormLabel>
                     <FormControl>
                       <PasswordInput 
                         placeholder="Enter your password" 
+                        className="h-11 text-base border-gray-300 focus:border-black"
                         {...field} 
                       />
                     </FormControl>
@@ -170,7 +173,7 @@ const EmailLoginPage = () => {
               <div className="flex justify-end">
                 <Button 
                   variant="link" 
-                  className="p-0 h-auto font-semibold text-black"
+                  className="p-0 h-auto font-medium text-black hover:text-gray-700"
                   type="button"
                   onClick={() => navigate('/forgot-password')}
                 >
@@ -180,7 +183,7 @@ const EmailLoginPage = () => {
               
               <Button
                 type="submit"
-                className="w-full h-12 bg-black hover:bg-gray-800 rounded-full"
+                className="w-full h-12 bg-black hover:bg-gray-800 rounded-full font-medium transition-colors"
                 disabled={isLoading}
               >
                 {isLoading ? "Logging in..." : "Login"}
@@ -190,10 +193,10 @@ const EmailLoginPage = () => {
         </AuthCard>
         
         <div className="text-center mt-8">
-          <p className="text-gray-600">Don't have an account?</p>
+          <p className="text-gray-600 mb-2">Don't have an account?</p>
           <Button 
             variant="link" 
-            className="font-semibold text-black underline p-0"
+            className="font-semibold text-black underline text-lg p-0 transition-colors hover:text-gray-700"
             onClick={() => navigate('/signup')}
           >
             Sign up
